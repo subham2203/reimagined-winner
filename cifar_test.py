@@ -43,7 +43,7 @@ num_classes = y_test.shape[1]
 # Create the model
 model = Sequential()
 # Block 1
-model.add(Conv2D(64, (3, 3), input_shape=(32, 32, 3), padding='same'))
+model.add(Conv2D(64, (3, 3), batch_input_shape=(64, 32, 32, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(64, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
