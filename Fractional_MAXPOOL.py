@@ -3,8 +3,6 @@ import random
 import numpy as np
 from keras.layers import *
 import tensorflow as tf
-from ..engine import Layer
-from ..engine import InputSpec
 
 class FractionalPooling2D(Layer):
 	def __init__(self, pool_ratio = None, pseudo_random = False, overlap = False, name ='FractionPooling2D', **kwargs):
