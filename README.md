@@ -11,5 +11,7 @@ FractionalPooling2D('pool_ratio' = 4-D Tuple, 'pseudo_random' = bool, 'overlap' 
 
 [1,1.44,1.67,1] is a valid 4-D tuple for Pooling ratio for [batch_size, rows, cols, channels]
 
+Use ( batch_input_shape ) while implementing
+
 To have a better understanding about Fractional Maxpooling refer to :
 https://arxiv.org/pdf/1412.6071.pdf
