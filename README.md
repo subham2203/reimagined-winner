@@ -7,5 +7,9 @@ Fractional Maxpooling is an advanced pooling algorithm that uses a fractional po
 
 The library for 2D Fractional Maxpooling for keras implementations is provided.
 
+FractionalPooling2D('pool_ratio' = 4-D Tuple, 'pseudo_random' = bool, 'overlap' = bool, name = string)
+
+[1,1.44,1.67.1] is a valid 4-D tuple for Pooling ratio for [batch_size, rows, cols, channels]
+
 To have a better understanding about Fractional Maxpooling refer to :
 https://arxiv.org/pdf/1412.6071.pdf
