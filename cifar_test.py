@@ -103,7 +103,7 @@ print(model.summary())
 
 checkpoint = ModelCheckpoint('Model.hdf5', monitor='val_loss', save_best_only = True, verbose=1, mode='min')
 
-callbacks_list = [checkpoint,EarlyStop]
+callbacks_list = [checkpoint]
 #model.load_weights('Model.hdf5')
 epochs = 1000
 model.fit(X_train, y_train, validation_data = [X_test,y_test], nb_epoch=epochs, batch_size=64, callbacks=callbacks_list)
