@@ -13,7 +13,7 @@ from keras.layers import Conv2D,Conv1D,LSTM
 from keras.layers.core import Reshape
 from keras.layers.pooling import MaxPooling1D
 from Fractional_MAXPOOL import FractionalPooling2D
-from keras.callbacks import ModelCheckpoint,EarlyStopping
+from keras.callbacks import ModelCheckpoint
 from keras.layers.advanced_activations import LeakyReLU
 K.set_image_dim_ordering('tf')
 
@@ -23,10 +23,12 @@ numpy.random.seed(seed)
 
 # load data
 (X_train, y_train), (X_test, y_test) = cifar10.load_data()
+
 X_train = X_train[0:49984]
 y_train = y_train[0:49984]
 X_test = X_test[0:9984]
 y_test = y_test[0:9984]
+
 # normalize inputs from 0-255 to 0.0-1.0
 X_train = X_train.astype('float32')
 X_test = X_test.astype('float32')
@@ -40,19 +42,19 @@ num_classes = y_test.shape[1]
 
 # Create the model
 model = Sequential()
-
+# Block 1
 model.add(Conv2D(64, (3, 3), input_shape=(32, 32, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(64, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(FractionalPooling2D(pool_ratio=(1, 1.6, 1.6, 1),pseudo_random = True,overlap=True))
-
+# Block 2
 model.add(Conv2D(128, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(128, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(FractionalPooling2D(pool_ratio=(1, 1.25, 1.25, 1),pseudo_random = True,overlap=True))
-
+# Block 3
 model.add(Conv2D(256, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(256, (3, 3), padding='same'))
@@ -60,7 +62,7 @@ model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(256, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(FractionalPooling2D(pool_ratio=(1, 1.6, 1.6, 1),pseudo_random = True,overlap=True))
-
+# Block 4
 model.add(Conv2D(256, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(256, (3, 3), padding='same'))
@@ -68,7 +70,7 @@ model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(256, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(FractionalPooling2D(pool_ratio=(1, 1.25, 1.25, 1),pseudo_random = True,overlap=True))
-
+# Block 5
 model.add(Conv2D(512, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(512, (3, 3), padding='same'))
@@ -76,7 +78,7 @@ model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(512, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(FractionalPooling2D(pool_ratio=(1, 1.6, 1.6, 1),pseudo_random = True,overlap=True))
-
+# Block 6
 model.add(Conv2D(512, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(Conv2D(512, (3, 3), padding='same'))
@@ -85,18 +87,11 @@ model.add(Conv2D(512, (3, 3), padding='same'))
 model.add(LeakyReLU(alpha = 0.3))
 model.add(FractionalPooling2D(pool_ratio=(1, 1.25, 1.25, 1),pseudo_random = True,overlap=True))
 model.add(Reshape((16,512)))
-
-model.add(Conv1D(512, kernel_size = 4, padding='same'))
-model.add(MaxPooling1D((2)))
-
-model.add(Conv1D(512, kernel_size = 4, padding='same'))
-model.add(MaxPooling1D((2)))
-
-model.add(LSTM(512, kernel_constraint=maxnorm(3)))
+# fc layer_1
+model.add(Dense(4096, kernel_constraint=maxnorm(3)))
 model.add(LeakyReLU(alpha = 0.3))
-model.add(Dropout(0.25))
-
-model.add(Dense(512, kernel_constraint=maxnorm(3)))
+# fc_layer_2
+model.add(Dense(4096, kernel_constraint=maxnorm(3)))
 model.add(LeakyReLU(alpha = 0.3))
 
 model.add(Dense(num_classes, activation='softmax'))
@@ -107,11 +102,11 @@ model.compile(loss='categorical_crossentropy', optimizer=opt,metrics=['accuracy'
 print(model.summary())
 
 checkpoint = ModelCheckpoint('Model.hdf5', monitor='val_loss', save_best_only = True, verbose=1, mode='min')
-EarlyStop = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=0, verbose=0, mode='auto')
+
 callbacks_list = [checkpoint,EarlyStop]
 #model.load_weights('Model.hdf5')
 epochs = 1000
-model.fit(X_train, y_train, validation_data = [X_test,y_test], nb_epoch=epochs, batch_size=16, callbacks=callbacks_list)
+model.fit(X_train, y_train, validation_data = [X_test,y_test], nb_epoch=epochs, batch_size=64, callbacks=callbacks_list)
 
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=0)
